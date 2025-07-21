@@ -1,0 +1,166 @@
+<!-- templates/index.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Heart Failure Prediction - XGBoost</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #e8f5e9;
+      padding: 40px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #2e7d32;
+    }
+
+    form {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 320px;
+      margin: auto;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+      text-align: left;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background-color: #66bb6a;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #388e3c;
+    }
+
+    .result {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .low {
+      color: green;
+    }
+
+    .high {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <h1>Heart Failure Risk Prediction</h1>
+  <form id="predictForm">
+    <label for="age">Age:</label>
+    <input type="number" id="age" name="age" required>
+
+    <label for="anaemia">Anaemia (0/1):</label>
+    <select id="anaemia" name="anaemia">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label for="cpk">Creatinine Phosphokinase (CPK):</label>
+    <input type="number" id="cpk" name="cpk" required>
+
+    <label for="diabetes">Diabetes (0/1):</label>
+    <select id="diabetes" name="diabetes">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label for="ejection">Ejection Fraction (%):</label>
+    <input type="number" id="ejection" name="ejection" required>
+
+    <label for="bp">High Blood Pressure (0/1):</label>
+    <select id="bp" name="bp">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <label for="platelets">Platelets (kiloplatelets/mL):</label>
+    <input type="number" id="platelets" name="platelets" required>
+
+    <label for="creatinine">Serum Creatinine (mg/dL):</label>
+    <input type="number" id="creatinine" name="creatinine" step="0.1" required>
+
+    <label for="sodium">Serum Sodium (mEq/L):</label>
+    <input type="number" id="sodium" name="sodium" required>
+
+    <label for="sex">Sex (0=Female, 1=Male):</label>
+    <select id="sex" name="sex">
+      <option value="0">Female</option>
+      <option value="1">Male</option>
+    </select>
+
+    <label for="smoking">Smoking (0/1):</label>
+    <select id="smoking" name="smoking">
+      <option value="0">No</option>
+      <option value="1">Yes</option>
+    </select>
+
+    <button type="submit">Predict</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    document.getElementById("predictForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const formData = {
+        age: parseFloat(document.getElementById("age").value),
+        anaemia: parseInt(document.getElementById("anaemia").value),
+        cpk: parseFloat(document.getElementById("cpk").value),
+        diabetes: parseInt(document.getElementById("diabetes").value),
+        ejection: parseFloat(document.getElementById("ejection").value),
+        bp: parseInt(document.getElementById("bp").value),
+        platelets: parseFloat(document.getElementById("platelets").value),
+        creatinine: parseFloat(document.getElementById("creatinine").value),
+        sodium: parseFloat(document.getElementById("sodium").value),
+        sex: parseInt(document.getElementById("sex").value),
+        smoking: parseInt(document.getElementById("smoking").value)
+      };
+
+      fetch('/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        const resultDiv = document.getElementById("result");
+        if (data.prediction === 1) {
+          resultDiv.innerHTML = '<span class="high">⚠️ High Risk of Heart Failure</span>';
+        } else {
+          resultDiv.innerHTML = '<span class="low">✅ Low Risk of Heart Failure</span>';
+        }
+      });
+    });
+  </script>
+</body>
+</html>
